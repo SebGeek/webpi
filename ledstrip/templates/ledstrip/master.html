@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %}
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    <p>Faster team to answer is {{ faster_team_to_answer }} team</p>
+    <p style="color:#FF0000">Red score: {{ red_score }}</p>
+    <p style="color:#0000FF">Blue score: {{ blue_score }}</p>
+    <table>
+        {{ form.add_point.label }}
+        {{ form.add_point }}
+    </table>
+    <table>
+        {{ form.remove_point.label }}
+        {{ form.remove_point }}
+    </table>
+    <table>
+        {{ form.bad_answer_continue.label }}
+        {{ form.bad_answer_continue }}
+    </table>
+    <p> <input type="submit" value="Submit" /> </p>
+    <table>
+        {{ form.blind_music.label }}
+        {{ form.blind_music }}
+    </table>
+    <table>
+        {{ form.volume.label }}
+        {{ form.volume.help_text }}
+        {{ form.volume }}
+    </table>
+</form>
+
+{% endblock %}

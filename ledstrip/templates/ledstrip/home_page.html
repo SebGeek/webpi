@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.LED_effect.label }}
+        {{ form.LED_effect }}
+    </table>
+    <table>
+        {{ form.music.label }}
+        {{ form.music }}
+    </table>
+    <table>
+        {{ form.volume.label }}
+        {{ form.volume.help_text }}
+        {{ form.volume }}
+    </table>
+    <input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

@@ -1,0 +1,285 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
+from .forms import ChristmasTree, BlindMaster, BlindTeam
+
+# sudo service apache2 stop
+# source ~/webpienv/bin/activate
+# python manage.py runserver 192.168.0.19:8000
+# sudo shutdown -h now
+
+# Add permission to www-data to access SPI bus
+#   sudo nano /etc/group
+#       spi:x:999:pi,www-data
+#       i2c:x:998:pi,www-data
+
+import time
+# noinspection PyUnresolvedReferences
+import RPi.GPIO as GPIO
+
+import Adafruit_WS2801
+import Adafruit_GPIO.SPI as SPI
+
+import threading
+import pygame
+from ledstrip.led_light import wheel
+
+# Configure the count of pixels:
+PIXEL_COUNT = 6
+ 
+# Alternatively specify a hardware SPI connection on /dev/spidev0.0:
+SPI_PORT   = 0
+SPI_DEVICE = 0
+
+thread_running = False
+thread_stop = False
+
+black = Adafruit_WS2801.RGB_to_color(0, 0, 0)
+blue  = Adafruit_WS2801.RGB_to_color(0, 0, 255)
+white = Adafruit_WS2801.RGB_to_color(100, 100, 100)
+red   = Adafruit_WS2801.RGB_to_color(255, 0, 0)
+green = Adafruit_WS2801.RGB_to_color(0, 255, 0)
+
+def unicolor(color):
+    LED_power_off()
+
+    for i in range(96):
+        pixels.set_pixel(i, color)
+        pixels.show()
+
+def rainbow_cycle(pixels, wait=0.005):
+    global thread_stop
+
+    for j in range(256): # one cycle of all 256 colors in the wheel
+        for i in range(pixels.count()):
+            pixels.set_pixel(i, wheel(((i * 256 // pixels.count()) + j) % 256))
+        pixels.show()
+        if wait > 0:
+            time.sleep(wait)
+        if thread_stop == True:
+            break
+
+def blink_color(pixels, blink_times=5, wait=0.5, color=(255, 0, 0)):
+    global thread_stop
+
+    for i in range(blink_times):
+        # blink two times, then wait
+        pixels.clear()
+        for j in range(2):
+            for k in range(pixels.count()):
+                pixels.set_pixel(k, Adafruit_WS2801.RGB_to_color( color[0], color[1], color[2]))
+            pixels.show()
+            time.sleep(0.08)
+            pixels.clear()
+            pixels.show()
+            time.sleep(0.08)
+        time.sleep(wait)
+        if thread_stop == True:
+            break
+
+def moving(pixels):
+    list_led = list(range(96 - 7)) + list(range(96 - 7, 0, -1))
+    for i2 in list_led:
+        pixels.clear()
+
+        for i in range(96 - 7):
+            if i == i2:
+                pixels.set_pixel(i + 0, blue)
+                pixels.set_pixel(i + 1, blue)
+                pixels.set_pixel(i + 2, white)
+                pixels.set_pixel(i + 3, white)
+                pixels.set_pixel(i + 4, red)
+                pixels.set_pixel(i + 5, red)
+                # pixels.set_pixel(i + 6, green)
+                # pixels.set_pixel(i + 7, green)
+        pixels.show()
+        time.sleep(0.02)
+        if thread_stop == True:
+            break
+
+def doCycle(effect):
+    global pixels, thread_running, thread_stop
+
+    thread_running = True
+    thread_stop = False
+    print("thread started")
+
+    while thread_stop == False:
+        if effect == 'rainbow':
+            rainbow_cycle(pixels, wait=0.01)
+        elif effect == 'blink':
+            blink_color(pixels, color=(255, 255, 255))
+        elif effect == 'moving':
+            moving(pixels)
+
+    thread_running = False
+    print("thread stopped")
+
+def LED_power_on(effect):
+    if thread_running == False:
+        t = threading.Thread(target=doCycle, daemon=True, args=(effect,))
+        t.start()
+
+def LED_power_off():
+    global pixels, thread_stop, thread_running
+
+    thread_stop = True
+    while thread_running == True:
+        time.sleep(0.1)
+
+    pixels.clear()
+    pixels.show()
+
+############################################################################
+# Create your views here
+
+def home_page(request):
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding)
+        form = ChristmasTree(request.POST)
+
+        # Check if the form is valid
+        if form.is_valid():
+            print(form.cleaned_data['LED_effect'])
+            if form.cleaned_data['LED_effect'] == 'off':
+                LED_power_off()
+            elif form.cleaned_data['LED_effect'] != '':
+                LED_power_off()
+                LED_power_on(form.cleaned_data['LED_effect'])
+
+            if form.cleaned_data['music'] == 'off':
+                stop_music()
+            elif form.cleaned_data['music'] != '':
+                play_music(form.cleaned_data['music'])
+
+            if form.cleaned_data['volume'] != None:
+                set_volume(form.cleaned_data['volume'])
+
+            # redirect to a new URL:
+            return HttpResponseRedirect('/')
+
+    # If this is a GET (or any other method) create the default form
+    else:
+        form = ChristmasTree()
+
+    return render(request, 'ledstrip/home_page.html', context={'form': form})
+
+############################################################################
+faster_team_to_answer = None
+blue_score = 0
+red_score = 0
+
+def master(request):
+    global faster_team_to_answer, blue_score, red_score
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding)
+        form = BlindMaster(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            if form.cleaned_data['blind_music'] == 'off':
+                stop_music()
+            elif form.cleaned_data['blind_music'] != '':
+                faster_team_to_answer = None
+                unicolor(black)
+                play_music(form.cleaned_data['blind_music'])
+
+            if form.cleaned_data['volume'] != None:
+                set_volume(form.cleaned_data['volume'])
+
+            if form.cleaned_data['add_point'] == 'blue':
+                blue_score += 1
+            elif form.cleaned_data['add_point'] == 'red':
+                red_score += 1
+            if form.cleaned_data['remove_point'] == 'blue':
+                blue_score -= 1
+            elif form.cleaned_data['remove_point'] == 'red':
+                red_score -= 1
+
+            if form.cleaned_data['bad_answer_continue'] == True:
+                faster_team_to_answer = None
+                unicolor(black)
+                continue_music()
+
+            # redirect to a new URL
+            return HttpResponseRedirect('/master')
+
+    # If this is a GET (or any other method) create the default form
+    else:
+        form = BlindMaster()
+
+    context = {'form': form, 'faster_team_to_answer': faster_team_to_answer,
+               'blue_score': blue_score, 'red_score': red_score}
+    return render(request, 'ledstrip/master.html', context=context)
+
+def blueteam(request):
+    return team(request, 'blue', blue)
+
+def redteam(request):
+    return team(request, 'red', red)
+
+def team(request, color, rgb_color):
+    global faster_team_to_answer, blue_score, red_score
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding)
+        form = BlindTeam(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            if faster_team_to_answer == None:
+                faster_team_to_answer = color
+                stop_music()
+                unicolor(rgb_color)
+
+            # redirect to a new URL
+            return HttpResponseRedirect(f'/{color}team')
+
+    # If this is a GET (or any other method) create the default form
+    else:
+        form = BlindTeam()
+
+    context = {'form': form, 'team': color, 'faster_team_to_answer': faster_team_to_answer,
+               'blue_score': blue_score, 'red_score': red_score}
+    return render(request, 'ledstrip/team.html', context=context)
+
+############################################################################
+
+def play_music(filepath):
+    pygame.mixer.music.load(filepath)
+    print("playing", filepath)
+    pygame.mixer.music.play()
+
+def stop_music():
+    print("stop music")
+    pygame.mixer.music.pause()
+
+def continue_music():
+    print("continue music")
+    pygame.mixer.music.unpause()
+
+def set_volume(volume):
+    ''' Set the volume of the music playback.
+    The volume argument is a float between 0.0 and 1.0 that sets volume.
+    '''
+    print(f"set volume {volume}%")
+    pygame.mixer.music.set_volume(volume / 100)
+
+
+# Executed when app is loaded
+print("init Adafruit_WS2801")
+pixels = Adafruit_WS2801.WS2801Pixels(96, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
+
+LED_power_on('rainbow')
+pygame.mixer.init()
