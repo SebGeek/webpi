@@ -6,16 +6,6 @@ from django.http import HttpResponseRedirect
 
 from .forms import ChristmasTree, BlindMaster, BlindTeam
 
-# sudo service apache2 stop
-# source ~/webpienv/bin/activate
-# python manage.py runserver 192.168.0.19:8000
-# sudo shutdown -h now
-
-# Add permission to www-data to access SPI bus
-#   sudo nano /etc/group
-#       spi:x:999:pi,www-data
-#       i2c:x:998:pi,www-data
-
 import time
 # noinspection PyUnresolvedReferences
 import RPi.GPIO as GPIO
@@ -190,7 +180,7 @@ def master(request):
                 stop_music()
             elif form.cleaned_data['blind_music'] != '':
                 faster_team_to_answer = None
-                unicolor(black)
+                unicolor(white)
                 play_music(form.cleaned_data['blind_music'])
 
             if form.cleaned_data['volume'] != None:
@@ -198,16 +188,21 @@ def master(request):
 
             if form.cleaned_data['add_point'] == 'blue':
                 blue_score += 1
+                unicolor(white)
             elif form.cleaned_data['add_point'] == 'red':
                 red_score += 1
+                unicolor(white)
             if form.cleaned_data['remove_point'] == 'blue':
                 blue_score -= 1
             elif form.cleaned_data['remove_point'] == 'red':
                 red_score -= 1
+            elif form.cleaned_data['remove_point'] == 'reset':
+                blue_score = 0
+                red_score = 0
 
             if form.cleaned_data['bad_answer_continue'] == True:
                 faster_team_to_answer = None
-                unicolor(black)
+                unicolor(white)
                 continue_music()
 
             # redirect to a new URL
@@ -278,8 +273,10 @@ def set_volume(volume):
 
 
 # Executed when app is loaded
+print("init pygame mixer")
+pygame.mixer.init()
+
 print("init Adafruit_WS2801")
 pixels = Adafruit_WS2801.WS2801Pixels(96, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
 
 LED_power_on('rainbow')
-pygame.mixer.init()

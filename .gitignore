@@ -5,7 +5,7 @@
 # Python compiled files
 *.pyc
 
-# virtual environment
+.bash_history
 webpienv/**
 .cache/**
 .config/**
