@@ -5,13 +5,6 @@
 # Python compiled files
 *.pyc
 
-.bash_history
-webpienv/**
-.cache/**
-.config/**
-.gnupg/**
-.local/**
-music/**
 static/**
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
