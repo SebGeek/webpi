@@ -168,7 +168,6 @@ python manage.py startapp ledstrip
 * Configure Django project
 ```
 nano ~/webpi/settings.py
-	Add application:
 	INSTALLED_APPS = (
 		'django.contrib.auth',
 		'django.contrib.contenttypes',
@@ -183,9 +182,6 @@ nano ~/webpi/settings.py
 
 	Update:
 		ALLOWED_HOSTS = ["192.168.0.25", "raspberrypi"]
-	
-	Add at the end of the file:
-		STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 python manage.py makemigrations
 python manage.py migrate
