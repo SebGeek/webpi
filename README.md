@@ -256,6 +256,8 @@ sudo nano /etc/apache2/apache2.conf
 ```
 chmod g+w db.sqlite3
 sudo chown :www-data db.sqlite3
+chmod g+w ~
+sudo chown :www-data ~
 chmod g+w ~/webpi
 sudo chown :www-data ~/webpi
 chmod g+w ~/webpi/webpi
