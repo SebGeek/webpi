@@ -14,7 +14,7 @@ import Adafruit_WS2801
 import Adafruit_GPIO.SPI as SPI
 
 import threading
-import pygame
+import pygame  # Need also to do: sudo apt-get install git curl libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 from ledstrip.led_light import wheel
 
 # Configure the count of pixels:

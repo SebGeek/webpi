@@ -9,7 +9,7 @@ LED_effect_choices = [('off',     'Off'),
                       ('moving',  'Moving')]
 
 music_choices = [('off', 'No music')]
-file_list = glob.glob("/home/pi/music/*.mp3")
+file_list = glob.glob("/home/pi/Music/*.mp3")
 for filepath in file_list:
     music_choices.append((filepath, filepath.split('/')[-1]))
 
@@ -20,7 +20,7 @@ class ChristmasTree(forms.Form):
 
 #####################################################################################
 blind_music_choices = [('off', 'No music')]
-file_list = glob.glob("/home/pi/music/blind_test/*.mp3")
+file_list = glob.glob("/home/pi/Music/blind_test/*.mp3")
 for filepath in file_list:
     blind_music_choices.append((filepath, filepath.split('/')[-1]))
 team_choice = [('blue', 'Blue team'), ('red', 'Red team')]
