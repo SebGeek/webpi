@@ -213,7 +213,7 @@ sudo nano /etc/apache2/sites-available/000-default.conf
     # match this virtual host. For the default virtual host (this file) this
     # value is not decisive as it is used as a last resort host regardless.
     # However, you must set it for any further virtual host explicitly.
-    #ServerName www.example.com
+    ServerName 127.0.0.1
   
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html
@@ -245,7 +245,14 @@ sudo nano /etc/apache2/sites-available/000-default.conf
     WSGIScriptAlias / /home/pi/webpi/webpi/wsgi.py
 </VirtualHost>
 ```
-Granting ownership of db.sqlite3 file and its parent directory (thereby write access also) to the user using chown
+* Add a line containing ServerName 127.0.0.1 to the end of the file
+```
+sudo nano /etc/apache2/apache2.conf
+
+  # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+  ServerName 127.0.0.1
+```
+* Granting ownership of db.sqlite3 file and its parent directory (thereby write access also) to the user using chown
 ```
 chmod g+w db.sqlite3
 sudo chown :www-data db.sqlite3
@@ -256,10 +263,13 @@ sudo chown :www-data ~/webpi/webpi
 ```
 * Restart server now accessible on normal port 80
 ```
-sudo apache2ctl restart
+sudo systemctl restart apache2
 
-cat /var/log/apache2/error.log
-apache2ctl -t
+check for errors:
+  cat /var/log/apache2/error.log
+
+check syntax of configuration files:
+  apache2ctl -t
 ```
 Browse http://raspberrypi/
 * Add permission to www-data to access SPI bus
@@ -276,3 +286,4 @@ sudo shutdown -h now
 ```
 => besoin d'une première requete pour démarrer l'appli ledstrip
 sinon utiliser un hook
+static pour le CSS !!
