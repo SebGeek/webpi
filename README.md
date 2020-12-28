@@ -285,12 +285,20 @@ sudo nano /etc/group
   spi:x:999:pi,www-data
   i2c:x:998:pi,www-data
 ```
+* Besoin d'une première requete pour démarrer l'appli ledstrip
+USE crontab:
+```
+crontab -e
+@reboot sleep 30 && curl http://127.0.0.1
+```
+=> SSE
+
 # Common commands
 ```
+sudo systemctl restart apache2
+
 source ~/webpienv/bin/activate
 python manage.py runserver 192.168.0.25:8000
+
 sudo shutdown -h now
 ```
-=> besoin d'une première requete pour démarrer l'appli ledstrip
-
-=> SSE
