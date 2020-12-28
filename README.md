@@ -233,7 +233,12 @@ sudo nano /etc/apache2/sites-available/000-default.conf
     # following line enables the CGI configuration for this host only
     # after it has been globally disabled with "a2disconf".
     #Include conf-available/serve-cgi-bin.conf
-      
+
+    Alias /static /home/pi/webpi/static
+    <Directory /home/pi/webpi/static>
+            Require all granted
+    </Directory>
+
     <Directory /home/pi/webpi/webpi>
         <Files wsgi.py>
             Require all granted
@@ -287,5 +292,5 @@ python manage.py runserver 192.168.0.25:8000
 sudo shutdown -h now
 ```
 => besoin d'une première requete pour démarrer l'appli ledstrip
-sinon utiliser un hook
-static pour le CSS !!
+
+=> SSE
