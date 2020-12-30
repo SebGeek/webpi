@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import ChristmasTree, BlindMaster, BlindTeam
-
+import ledstrip.glob_var
 
 ############################################################################ LED
 import time
@@ -30,12 +30,6 @@ SPI_DEVICE = 0
 thread_running = False
 thread_stop = False
 
-if is_raspberry_pi:
-    blue  = Adafruit_WS2801.RGB_to_color(0, 0, 255)
-    white = Adafruit_WS2801.RGB_to_color(100, 100, 100)
-    red   = Adafruit_WS2801.RGB_to_color(255, 0, 0)
-else:
-    blue = white = red = None
 
 def unicolor(color):
     if is_raspberry_pi:
@@ -83,12 +77,12 @@ def moving(pixels):
 
         for i in range(96 - nb_pixels):
             if i == i2:
-                pixels.set_pixel(i + 0, blue)
-                pixels.set_pixel(i + 1, blue)
-                pixels.set_pixel(i + 2, white)
-                pixels.set_pixel(i + 3, white)
-                pixels.set_pixel(i + 4, red)
-                pixels.set_pixel(i + 5, red) # update nb_pixels accordingly
+                pixels.set_pixel(i + 0, ledstrip.glob_var.blue)
+                pixels.set_pixel(i + 1, ledstrip.glob_var.blue)
+                pixels.set_pixel(i + 2, ledstrip.glob_var.white)
+                pixels.set_pixel(i + 3, ledstrip.glob_var.white)
+                pixels.set_pixel(i + 4, ledstrip.glob_var.red)
+                pixels.set_pixel(i + 5, ledstrip.glob_var.red) # update nb_pixels accordingly
         pixels.show()
         time.sleep(0.02)
         if thread_stop == True:
@@ -187,13 +181,7 @@ def home_page(request):
 
     return render(request, 'ledstrip/home_page.html', context={'form': form})
 
-faster_team_to_answer = None
-blue_score = 0
-red_score = 0
-
 def master(request):
-    global faster_team_to_answer, blue_score, red_score
-
     # If this is a POST request then process the Form data
     if request.method == 'POST':
 
@@ -205,30 +193,30 @@ def master(request):
             if form.cleaned_data['blind_music'] == 'off':
                 stop_music()
             elif form.cleaned_data['blind_music'] != '':
-                faster_team_to_answer = None
-                unicolor(white)
+                ledstrip.glob_var.faster_team_to_answer = None
+                unicolor(ledstrip.glob_var.white)
                 play_music(form.cleaned_data['blind_music'])
 
             if form.cleaned_data['volume'] != None:
                 set_volume(form.cleaned_data['volume'])
 
             if form.cleaned_data['add_point'] == 'blue':
-                blue_score += 1
-                unicolor(white)
+                ledstrip.glob_var.blue_score += 1
+                unicolor(ledstrip.glob_var.white)
             elif form.cleaned_data['add_point'] == 'red':
-                red_score += 1
-                unicolor(white)
+                ledstrip.glob_var.red_score += 1
+                unicolor(ledstrip.glob_var.white)
             if form.cleaned_data['remove_point'] == 'blue':
-                blue_score -= 1
+                ledstrip.glob_var.blue_score -= 1
             elif form.cleaned_data['remove_point'] == 'red':
-                red_score -= 1
+                ledstrip.glob_var.red_score -= 1
             elif form.cleaned_data['remove_point'] == 'reset':
-                blue_score = 0
-                red_score = 0
+                ledstrip.glob_var.blue_score = 0
+                ledstrip.glob_var.red_score = 0
 
             if form.cleaned_data['bad_answer_continue'] == True:
-                faster_team_to_answer = None
-                unicolor(white)
+                ledstrip.glob_var.faster_team_to_answer = None
+                unicolor(ledstrip.glob_var.white)
                 continue_music()
 
             # redirect to a new URL
@@ -238,19 +226,17 @@ def master(request):
     else:
         form = BlindMaster()
 
-    context = {'form': form, 'faster_team_to_answer': faster_team_to_answer,
-               'blue_score': blue_score, 'red_score': red_score}
+    context = {'form': form, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+               'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
     return render(request, 'ledstrip/master.html', context=context)
 
 def blueteam(request):
-    return team(request, 'blue', blue)
+    return team(request, 'blue', ledstrip.glob_var.blue)
 
 def redteam(request):
-    return team(request, 'red', red)
+    return team(request, 'red', ledstrip.glob_var.red)
 
 def team(request, color, rgb_color):
-    global faster_team_to_answer, blue_score, red_score
-
     # If this is a POST request then process the Form data
     if request.method == 'POST':
 
@@ -259,8 +245,8 @@ def team(request, color, rgb_color):
 
         # Check if the form is valid:
         if form.is_valid():
-            if faster_team_to_answer == None:
-                faster_team_to_answer = color
+            if ledstrip.glob_var.faster_team_to_answer == None:
+                ledstrip.glob_var.faster_team_to_answer = color
                 stop_music()
                 unicolor(rgb_color)
 
@@ -271,8 +257,8 @@ def team(request, color, rgb_color):
     else:
         form = BlindTeam()
 
-    context = {'form': form, 'team': color, 'faster_team_to_answer': faster_team_to_answer,
-               'blue_score': blue_score, 'red_score': red_score, 'room_name': 'team_blind'}
+    context = {'form': form, 'team': color, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+               'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score, 'room_name': 'team_blind'}
     return render(request, 'ledstrip/team.html', context=context)
 
 
