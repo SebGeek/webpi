@@ -258,7 +258,7 @@ def team(request, color, rgb_color):
         form = BlindTeam()
 
     context = {'form': form, 'team': color, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
-               'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score, 'room_name': 'team_blind'}
+               'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
     return render(request, 'ledstrip/team.html', context=context)
 
 

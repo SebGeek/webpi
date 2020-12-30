@@ -8,8 +8,7 @@ import ledstrip.glob_var
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = 'team_blind'
-        self.room_group_name = 'chat_%s' % self.room_name
+        self.room_group_name = 'chat_team_blind'
 
         # Join room group
         await self.channel_layer.group_add(
@@ -41,7 +40,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             unicolor(rgb_color)
 
         context = {'team': text_data_json['team'], 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
-                   'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score, 'room_name': 'team_blind'}
+                   'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
 
         # Send message to room group
         await self.channel_layer.group_send(
