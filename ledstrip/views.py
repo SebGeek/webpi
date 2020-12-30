@@ -3,19 +3,21 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-
 from .forms import ChristmasTree, BlindMaster, BlindTeam
 
 import time
-# noinspection PyUnresolvedReferences
-import RPi.GPIO as GPIO
 
-import Adafruit_WS2801
-import Adafruit_GPIO.SPI as SPI
+from .utils import is_raspberry_pi
+
+if is_raspberry_pi:
+    # noinspection PyUnresolvedReferences
+    import RPi.GPIO as GPIO
+    import Adafruit_WS2801
+    import Adafruit_GPIO.SPI as SPI
+    from ledstrip.led_light import wheel
 
 import threading
 import pygame  # Need also to do: sudo apt-get install git curl libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
-from ledstrip.led_light import wheel
 
 # Configure the count of pixels:
 PIXEL_COUNT = 6
@@ -27,18 +29,20 @@ SPI_DEVICE = 0
 thread_running = False
 thread_stop = False
 
-black = Adafruit_WS2801.RGB_to_color(0, 0, 0)
-blue  = Adafruit_WS2801.RGB_to_color(0, 0, 255)
-white = Adafruit_WS2801.RGB_to_color(100, 100, 100)
-red   = Adafruit_WS2801.RGB_to_color(255, 0, 0)
-green = Adafruit_WS2801.RGB_to_color(0, 255, 0)
+if is_raspberry_pi:
+    blue  = Adafruit_WS2801.RGB_to_color(0, 0, 255)
+    white = Adafruit_WS2801.RGB_to_color(100, 100, 100)
+    red   = Adafruit_WS2801.RGB_to_color(255, 0, 0)
+else:
+    blue = white = red = None
 
 def unicolor(color):
-    LED_power_off()
+    if is_raspberry_pi:
+        LED_power_off()
 
-    for i in range(96):
-        pixels.set_pixel(i, color)
-        pixels.show()
+        for i in range(96):
+            pixels.set_pixel(i, color)
+            pixels.show()
 
 def rainbow_cycle(pixels, wait=0.005):
     global thread_stop
@@ -71,20 +75,19 @@ def blink_color(pixels, blink_times=5, wait=0.5, color=(255, 0, 0)):
             break
 
 def moving(pixels):
-    list_led = list(range(96 - 7)) + list(range(96 - 7, 0, -1))
+    nb_pixels = 5
+    list_led = list(range(96 - nb_pixels)) + list(range(96 - nb_pixels, 0, -1))
     for i2 in list_led:
         pixels.clear()
 
-        for i in range(96 - 7):
+        for i in range(96 - nb_pixels):
             if i == i2:
                 pixels.set_pixel(i + 0, blue)
                 pixels.set_pixel(i + 1, blue)
                 pixels.set_pixel(i + 2, white)
                 pixels.set_pixel(i + 3, white)
                 pixels.set_pixel(i + 4, red)
-                pixels.set_pixel(i + 5, red)
-                # pixels.set_pixel(i + 6, green)
-                # pixels.set_pixel(i + 7, green)
+                pixels.set_pixel(i + 5, red) # update nb_pixels accordingly
         pixels.show()
         time.sleep(0.02)
         if thread_stop == True:
@@ -109,19 +112,21 @@ def doCycle(effect):
     print("thread stopped")
 
 def LED_power_on(effect):
-    if thread_running == False:
-        t = threading.Thread(target=doCycle, daemon=True, args=(effect,))
-        t.start()
+    if is_raspberry_pi:
+        if thread_running == False:
+            t = threading.Thread(target=doCycle, daemon=True, args=(effect,))
+            t.start()
 
 def LED_power_off():
-    global pixels, thread_stop, thread_running
+    if is_raspberry_pi:
+        global pixels, thread_stop, thread_running
 
-    thread_stop = True
-    while thread_running == True:
-        time.sleep(0.1)
+        thread_stop = True
+        while thread_running == True:
+            time.sleep(0.1)
 
-    pixels.clear()
-    pixels.show()
+        pixels.clear()
+        pixels.show()
 
 ############################################################################
 # Create your views here
@@ -272,11 +277,13 @@ def set_volume(volume):
     pygame.mixer.music.set_volume(volume / 100)
 
 
+#if __name__ == '__main__':
 # Executed when app is loaded
 print("init pygame mixer")
 pygame.mixer.init()
 
-print("init Adafruit_WS2801")
-pixels = Adafruit_WS2801.WS2801Pixels(96, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
+if is_raspberry_pi:
+    print("init Adafruit_WS2801")
+    pixels = Adafruit_WS2801.WS2801Pixels(96, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
 
-LED_power_on('rainbow')
+    LED_power_on('rainbow')
