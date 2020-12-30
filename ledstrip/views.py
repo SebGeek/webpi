@@ -5,8 +5,9 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .forms import ChristmasTree, BlindMaster, BlindTeam
 
-import time
 
+############################################################################ LED
+import time
 from .utils import is_raspberry_pi
 
 if is_raspberry_pi:
@@ -128,6 +129,27 @@ def LED_power_off():
         pixels.clear()
         pixels.show()
 
+############################################################################ MUSIC
+def play_music(filepath):
+    pygame.mixer.music.load(filepath)
+    print("playing", filepath)
+    pygame.mixer.music.play()
+
+def stop_music():
+    print("stop music")
+    pygame.mixer.music.pause()
+
+def continue_music():
+    print("continue music")
+    pygame.mixer.music.unpause()
+
+def set_volume(volume):
+    ''' Set the volume of the music playback.
+    The volume argument is a float between 0.0 and 1.0 that sets volume.
+    '''
+    print(f"set volume {volume}%")
+    pygame.mixer.music.set_volume(volume / 100)
+
 ############################################################################
 # Create your views here
 
@@ -165,7 +187,6 @@ def home_page(request):
 
     return render(request, 'ledstrip/home_page.html', context={'form': form})
 
-############################################################################
 faster_team_to_answer = None
 blue_score = 0
 red_score = 0
@@ -251,41 +272,16 @@ def team(request, color, rgb_color):
         form = BlindTeam()
 
     context = {'form': form, 'team': color, 'faster_team_to_answer': faster_team_to_answer,
-               'blue_score': blue_score, 'red_score': red_score}
+               'blue_score': blue_score, 'red_score': red_score, 'room_name': 'team_blind'}
     return render(request, 'ledstrip/team.html', context=context)
 
-############################################################################
 
-def play_music(filepath):
-    pygame.mixer.music.load(filepath)
-    print("playing", filepath)
-    pygame.mixer.music.play()
-
-def stop_music():
-    print("stop music")
-    pygame.mixer.music.pause()
-
-def continue_music():
-    print("continue music")
-    pygame.mixer.music.unpause()
-
-def set_volume(volume):
-    ''' Set the volume of the music playback.
-    The volume argument is a float between 0.0 and 1.0 that sets volume.
-    '''
-    print(f"set volume {volume}%")
-    pygame.mixer.music.set_volume(volume / 100)
-
-def index(request):
-    return render(request, 'ledstrip/index.html')
-
-def room(request, room_name):
-    return render(request, 'ledstrip/room.html', {
-        'room_name': room_name
-    })
+############################################################################ INIT
 
 #if __name__ == '__main__':
-# Executed when app is loaded
+# Executed when app is loaded:
+# - With Apache, as soon as the first request is received, triggering the application start
+# - In development, as soon as the server is started
 print("init pygame mixer")
 pygame.mixer.init()
 
