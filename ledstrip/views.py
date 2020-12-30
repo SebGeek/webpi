@@ -276,6 +276,13 @@ def set_volume(volume):
     print(f"set volume {volume}%")
     pygame.mixer.music.set_volume(volume / 100)
 
+def index(request):
+    return render(request, 'ledstrip/index.html')
+
+def room(request, room_name):
+    return render(request, 'ledstrip/room.html', {
+        'room_name': room_name
+    })
 
 #if __name__ == '__main__':
 # Executed when app is loaded

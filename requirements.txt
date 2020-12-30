@@ -3,6 +3,8 @@
 Adafruit-GPIO
 Adafruit-PureIO
 Adafruit-WS2801
-Django
 RPi.GPIO
 pygame
+django
+channels
+channels_redis

@@ -291,7 +291,6 @@ USE crontab:
 crontab -e
 @reboot sleep 30 && curl http://127.0.0.1
 ```
-=> SSE
 
 # Common commands
 ```
