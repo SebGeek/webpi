@@ -9,9 +9,9 @@
     <p style="color:#0000FF">Blue score: {{ blue_score }}</p>
     <input type="submit" value="I've got the answer !" />
 </form>
-
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
+    <p></p>
+    <textarea id="chat-log" cols="60" rows="10"></textarea><br>
+    <input id="chat-message-input" type="text" size="60"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
     <script>
