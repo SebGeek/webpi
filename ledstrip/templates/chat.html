@@ -3,17 +3,15 @@
 <input id="chat-message-input" type="text" size="60"><br>
 <input id="chat-message-submit" type="button" value="Send">
 {{ room_name|json_script:"room-name" }}
+{{ team_name|json_script:"team-name" }}
 <script>
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-    const chatSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/team_blind/'
-    );
+    const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/team_blind/');
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
+
         document.querySelector('#chat-log').value += (data.message + '\n');
     };
 
@@ -31,8 +29,11 @@
     document.querySelector('#chat-message-submit').onclick = function(e) {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value;
+        const teamName = JSON.parse(document.getElementById('team-name').textContent);
+
         chatSocket.send(JSON.stringify({
-            'message': message
+            'message': message,
+            'team': teamName
         }));
         messageInputDom.value = '';
     };
