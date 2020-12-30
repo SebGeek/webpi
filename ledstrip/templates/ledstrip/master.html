@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
-{% block content %}
 
+{% block content %}
 <form action="" method="post">
     {% csrf_token %}
     <p>Faster team to answer is {{ faster_team_to_answer }} team</p>
@@ -29,5 +29,7 @@
         {{ form.volume }}
     </table>
 </form>
+
+{% include 'chat.html' %}
 
 {% endblock %}
