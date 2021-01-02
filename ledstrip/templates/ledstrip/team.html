@@ -41,7 +41,7 @@
         const data = JSON.parse(e.data);
         document.getElementById("blue_score_text").innerHTML = blue_tag + data.context['blue_score'].toString() + '</p>';
         document.getElementById("red_score_text").innerHTML  = red_tag  + data.context['red_score'].toString()  + '</p>';
-        document.getElementById("faster_team_to_answer_text").innerHTML = '<p>Faster team to answer is ' + data.context['faster_team_to_answer'].toString() + '</p>';
+        document.getElementById("faster_team_to_answer_text").innerHTML = '<p>Faster team to answer is ' + data.context['faster_team_to_answer'] + '</p>';
     };
 
 </script>

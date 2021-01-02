@@ -29,18 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = f"{text_data_json['team']} team: {text_data_json['message']}"
-
-        if text_data_json['team'] in ['blue', 'red']:
-            ledstrip.glob_var.faster_team_to_answer = text_data_json['team']
-            if text_data_json['team'] == 'blue':
-                rgb_color = ledstrip.glob_var.blue
-            else:
-                rgb_color = ledstrip.glob_var.red
-            stop_music()
-            unicolor(rgb_color)
-
-        context = {'team': text_data_json['team'], 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
-                   'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
+        context = {'team': text_data_json['team']}
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -81,7 +70,15 @@ class TeamBlindConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
 
         if text_data_json['team'] in ['blue', 'red']:
-            print(f"{text_data_json['team']}")
+            if ledstrip.glob_var.faster_team_to_answer == None:
+                ledstrip.glob_var.faster_team_to_answer = text_data_json['team']
+                if text_data_json['team'] == 'blue':
+                    rgb_color = ledstrip.glob_var.blue
+                else:
+                    rgb_color = ledstrip.glob_var.red
+                stop_music()
+                unicolor(rgb_color)
+
         elif text_data_json['team'] == 'master':
             if text_data_json['add_point'] == 'blue':
                 ledstrip.glob_var.blue_score += 1

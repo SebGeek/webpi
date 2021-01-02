@@ -222,26 +222,9 @@ def blueteam(request):
 def redteam(request):
     return team(request, 'red', ledstrip.glob_var.red)
 
-def team(request, color, rgb_color):
-    # If this is a POST request then process the Form data
-    if request.method == 'POST':
-
-        # Create a form instance and populate it with data from the request (binding)
-        form = BlindTeam(request.POST)
-
-        # Check if the form is valid:
-        if form.is_valid():
-            if ledstrip.glob_var.faster_team_to_answer == None:
-                ledstrip.glob_var.faster_team_to_answer = color
-                stop_music()
-                unicolor(rgb_color)
-
-            # redirect to a new URL
-            return HttpResponseRedirect(f'/{color}team')
-
-    # If this is a GET (or any other method) create the default form
-    else:
-        form = BlindTeam()
+def team(request, color, _rgb_color):
+    # It is a GET, create the default form
+    form = BlindTeam()
 
     context = {'form': form, 'team': color, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
                'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
