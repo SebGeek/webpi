@@ -83,7 +83,6 @@ class TeamBlindConsumer(AsyncWebsocketConsumer):
         if text_data_json['team'] in ['blue', 'red']:
             print(f"{text_data_json['team']}")
         elif text_data_json['team'] == 'master':
-            print(f"master {text_data_json}")
             if text_data_json['add_point'] == 'blue':
                 ledstrip.glob_var.blue_score += 1
                 unicolor(ledstrip.glob_var.white)

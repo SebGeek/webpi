@@ -3,30 +3,30 @@
 {% block content %}
 
 <form>
-  {% csrf_token %}
-  <h1>Your team is {{ team }}</h1>
-  <p>Faster team to answer is {{ faster_team_to_answer }}</p>
-  <div id="blue_score_text"></div>
-  <div id="red_score_text"></div>
-  <p>Add 1 point to </p>
-  <div>
-    <input type="radio" id="blue_team" name="add_point" value="blue">
-    <label for="blue_team">Blue team</label>
-    <input type="radio" id="red_team" name="add_point" value="red">
-    <label for="red_team">Red team</label>
-  </div>
-  <p>Remove 1 point to </p>
-  <div>
-    <input type="radio" id="remove_blue_team" name="remove_point" value="blue">
-    <label for="remove_blue_team">Blue team</label>
-    <input type="radio" id="remove_red_team" name="remove_point" value="red">
-    <label for="remove_red_team">Red team</label>
-    <input type="radio" id="reset" name="remove_point" value="reset">
-    <label for="reset">Reset all scores</label>
-  </div>
-  <div>
-    <button type="submit">Send</button>
-  </div>
+    {% csrf_token %}
+    <h1>Your team is {{ team }}</h1>
+    <p>Faster team to answer is {{ faster_team_to_answer }}</p>
+    <div id="blue_score_text"></div>
+    <div id="red_score_text"></div>
+    <p>Add 1 point to </p>
+    <div>
+        <input type="radio" id="blue_team" name="add_point" value="blue">
+        <label for="blue_team">Blue team</label>
+        <input type="radio" id="red_team" name="add_point" value="red">
+        <label for="red_team">Red team</label>
+    </div>
+    <p>Remove 1 point to </p>
+    <div>
+        <input type="radio" id="remove_blue_team" name="remove_point" value="blue">
+        <label for="remove_blue_team">Blue team</label>
+        <input type="radio" id="remove_red_team" name="remove_point" value="red">
+        <label for="remove_red_team">Red team</label>
+        <input type="radio" id="reset" name="remove_point" value="reset">
+        <label for="reset">Reset all scores</label>
+    </div>
+    <div>
+        <button type="submit">Send</button>
+    </div>
 </form>
 
 <script>
@@ -64,6 +64,6 @@
 
 </script>
 
-{% include 'chat.html' with team_name='master' %}
+{% include 'chat.html' with team_name=team %}
 
 {% endblock %}

@@ -4,16 +4,29 @@
 
 <form>
     {% csrf_token %}
-    <h1>Your team is {{ team }}</h1>
-    <p>Faster team to answer is {{ faster_team_to_answer }}</p>
+    <h1>Your team is {{ team }}{{ team|json_script:"team-name" }}</h1>
+    <div id="faster_team_to_answer_text"></div>
     <div id="blue_score_text"></div>
     <div id="red_score_text"></div>
+    <div>
+        <button type="submit">I've got the answer !</button>
+    </div>
 </form>
 
 <script>
     const team_blindSocket = new WebSocket('ws://' + window.location.host + '/ws/team_blind/');
     const blue_tag = '<p style="color:#0000FF">Blue team\'s score: ';
     const red_tag  = '<p style="color:#FF0000">Red team\'s score: ';
+
+    var form = document.querySelector("form");
+
+    form.addEventListener("submit", function(event) {
+          var data = new FormData(form);
+          const teamName = JSON.parse(document.getElementById('team-name').textContent);
+
+          team_blindSocket.send(JSON.stringify({'team': teamName}));
+          event.preventDefault();
+        }, false);
 
     team_blindSocket.onopen = function(e) {
         document.getElementById("blue_score_text").innerHTML = blue_tag + '0' + '</p>';
@@ -28,6 +41,7 @@
         const data = JSON.parse(e.data);
         document.getElementById("blue_score_text").innerHTML = blue_tag + data.context['blue_score'].toString() + '</p>';
         document.getElementById("red_score_text").innerHTML  = red_tag  + data.context['red_score'].toString()  + '</p>';
+        document.getElementById("faster_team_to_answer_text").innerHTML = '<p>Faster team to answer is ' + data.context['faster_team_to_answer'].toString() + '</p>';
     };
 
 </script>
