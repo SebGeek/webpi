@@ -200,20 +200,6 @@ def master(request):
             if form.cleaned_data['volume'] != None:
                 set_volume(form.cleaned_data['volume'])
 
-            if form.cleaned_data['add_point'] == 'blue':
-                ledstrip.glob_var.blue_score += 1
-                unicolor(ledstrip.glob_var.white)
-            elif form.cleaned_data['add_point'] == 'red':
-                ledstrip.glob_var.red_score += 1
-                unicolor(ledstrip.glob_var.white)
-            if form.cleaned_data['remove_point'] == 'blue':
-                ledstrip.glob_var.blue_score -= 1
-            elif form.cleaned_data['remove_point'] == 'red':
-                ledstrip.glob_var.red_score -= 1
-            elif form.cleaned_data['remove_point'] == 'reset':
-                ledstrip.glob_var.blue_score = 0
-                ledstrip.glob_var.red_score = 0
-
             if form.cleaned_data['bad_answer_continue'] == True:
                 ledstrip.glob_var.faster_team_to_answer = None
                 unicolor(ledstrip.glob_var.white)
@@ -226,7 +212,7 @@ def master(request):
     else:
         form = BlindMaster()
 
-    context = {'form': form, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+    context = {'form': form, 'team': 'master', 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
                'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
     return render(request, 'ledstrip/master.html', context=context)
 

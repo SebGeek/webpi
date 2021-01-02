@@ -1,35 +1,69 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}
-    <p>Faster team to answer is {{ faster_team_to_answer }} team</p>
-    <p style="color:#FF0000">Red score: {{ red_score }}</p>
-    <p style="color:#0000FF">Blue score: {{ blue_score }}</p>
-    <table>
-        {{ form.add_point.label }}
-        {{ form.add_point }}
-    </table>
-    <table>
-        {{ form.remove_point.label }}
-        {{ form.remove_point }}
-    </table>
-    <table>
-        {{ form.bad_answer_continue.label }}
-        {{ form.bad_answer_continue }}
-    </table>
-    <p> <input type="submit" value="Submit" /> </p>
-    <table>
-        {{ form.blind_music.label }}
-        {{ form.blind_music }}
-    </table>
-    <table>
-        {{ form.volume.label }}
-        {{ form.volume.help_text }}
-        {{ form.volume }}
-    </table>
+
+<form>
+  {% csrf_token %}
+  <h1>Your team is {{ team }}</h1>
+  <p>Faster team to answer is {{ faster_team_to_answer }}</p>
+  <div id="blue_score_text"></div>
+  <div id="red_score_text"></div>
+  <p>Add 1 point to </p>
+  <div>
+    <input type="radio" id="blue_team" name="add_point" value="blue">
+    <label for="blue_team">Blue team</label>
+    <input type="radio" id="red_team" name="add_point" value="red">
+    <label for="red_team">Red team</label>
+  </div>
+  <p>Remove 1 point to </p>
+  <div>
+    <input type="radio" id="remove_blue_team" name="remove_point" value="blue">
+    <label for="remove_blue_team">Blue team</label>
+    <input type="radio" id="remove_red_team" name="remove_point" value="red">
+    <label for="remove_red_team">Red team</label>
+    <input type="radio" id="reset" name="remove_point" value="reset">
+    <label for="reset">Reset all scores</label>
+  </div>
+  <div>
+    <button type="submit">Send</button>
+  </div>
 </form>
 
-{% include 'chat.html' with team_name='Master' %}
+<script>
+    const team_blindSocket = new WebSocket('ws://' + window.location.host + '/ws/team_blind/');
+    const blue_tag = '<p style="color:#0000FF">Blue team\'s score: ';
+    const red_tag  = '<p style="color:#FF0000">Red team\'s score: ';
+
+    var form = document.querySelector("form");
+
+    form.addEventListener("submit", function(event) {
+          var data = new FormData(form);
+
+          console.log(data.get('add_point'));
+          console.log(data.get('remove_point'));
+
+          team_blindSocket.send(JSON.stringify({'team': 'master', 'add_point': data.get('add_point'),
+                                                'remove_point': data.get('remove_point')}));
+          event.preventDefault();
+        }, false);
+
+    team_blindSocket.onopen = function(e) {
+        document.getElementById("blue_score_text").innerHTML = blue_tag + '0' + '</p>';
+        document.getElementById("red_score_text").innerHTML  = red_tag  + '0' + '</p>';
+    };
+
+    team_blindSocket.onclose = function(e) {
+        console.error('team_blindSocket socket closed unexpectedly');
+    };
+
+    team_blindSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        document.getElementById("blue_score_text").innerHTML = blue_tag + data.context['blue_score'].toString() + '</p>';
+        document.getElementById("red_score_text").innerHTML  = red_tag  + data.context['red_score'].toString()  + '</p>';
+    };
+
+</script>
+
+{% include 'chat.html' with team_name='master' %}
 
 {% endblock %}
