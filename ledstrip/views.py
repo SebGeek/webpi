@@ -200,7 +200,7 @@ def team(request, color):
 
 ############################################################################ INIT
 
-#if __name__ == '__main__':
+# Do not use: if __name__ == '__main__':
 # Executed when app is loaded:
 # - With Apache, as soon as the first request is received, triggering the application start
 # - In development, as soon as the server is started

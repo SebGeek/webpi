@@ -2,7 +2,7 @@
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .views import unicolor, stop_music
+from .views import unicolor, stop_music, set_volume, continue_music, play_music
 import ledstrip.glob_var
 
 
@@ -93,6 +93,21 @@ class TeamBlindConsumer(AsyncWebsocketConsumer):
             elif text_data_json['remove_point'] == 'reset':
                 ledstrip.glob_var.blue_score = 0
                 ledstrip.glob_var.red_score = 0
+
+            if text_data_json['blind_music'] == 'off':
+                stop_music()
+            elif text_data_json['blind_music'] != '':
+                ledstrip.glob_var.faster_team_to_answer = None
+                unicolor(ledstrip.glob_var.white)
+                play_music(text_data_json['blind_music'])
+
+            if text_data_json['volume'] != None:
+                set_volume(text_data_json['volume'])
+
+            if text_data_json['bad_answer_continue'] == True:
+                ledstrip.glob_var.faster_team_to_answer = None
+                unicolor(ledstrip.glob_var.white)
+                continue_music()
 
         context = {'team': text_data_json['team'], 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
                    'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}

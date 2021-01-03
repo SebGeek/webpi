@@ -30,7 +30,7 @@
     </div>
     <div>
         <button type="button" id="button_blind">Send</button>
-        <p>Volume between 0 and 100%</p><input type="number" min="0" max="100" step="1">
+        <p>Volume between 0 and 100%</p><input type="number" id="volume" min="0" max="100" step="1">
         <p>Music choice</p> <select name="pets" id="pet-select" size="20">
                                 <option value="dog">Dog</option>
                                 <option value="cat">Cat</option>
@@ -50,9 +50,13 @@
     btn.addEventListener("click", function(event) {
           var data = new FormData(form);
           const teamName = JSON.parse(document.getElementById('team-name').textContent);
+          const volume = document.getElementById('volume').value;
+          const bad_answer_continue = document.getElementById('bad_answer_continue').checked;
 
-          team_blindSocket.send(JSON.stringify({'team': teamName, 'add_point': data.get('add_point'),
-                                                'remove_point': data.get('remove_point')}));
+          team_blindSocket.send(JSON.stringify(
+            {'team': teamName, 'add_point': data.get('add_point'), 'remove_point': data.get('remove_point'),
+            'blind_music': '', 'volume':parseInt(volume), 'bad_answer_continue':bad_answer_continue}));
+
           document.getElementById("add_blue_team").checked = false;
           document.getElementById("add_red_team").checked = false;
           document.getElementById("remove_blue_team").checked = false;
