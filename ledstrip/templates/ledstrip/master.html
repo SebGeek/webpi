@@ -25,7 +25,17 @@
         <label for="reset">Reset all scores</label>
     </div>
     <div>
-        <button type="submit">Send</button>
+        <input type="checkbox" id="bad_answer_continue" name="bad_answer_continue">
+        <label for="bad_answer_continue">Bad answer, let's music continue</label>
+    </div>
+    <div>
+        <button type="button" id="button_blind">Send</button>
+        <p>Volume between 0 and 100%</p><input type="number" min="0" max="100" step="1">
+        <p>Music choice</p> <select name="pets" id="pet-select" size="20">
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                                <option value="hamster">Hamster</option>
+                            </select>
     </div>
 </form>
 
@@ -35,8 +45,9 @@
     const red_tag  = '<p style="color:#FF0000">Red team\'s score: ';
 
     var form = document.querySelector("form");
+    var btn = document.getElementById('button_blind');
 
-    form.addEventListener("submit", function(event) {
+    btn.addEventListener("click", function(event) {
           var data = new FormData(form);
           const teamName = JSON.parse(document.getElementById('team-name').textContent);
 

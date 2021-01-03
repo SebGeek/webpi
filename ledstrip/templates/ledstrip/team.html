@@ -9,7 +9,7 @@
     <div id="blue_score_text"></div>
     <div id="red_score_text"></div>
     <div>
-        <button type="submit">I've got the answer !</button>
+        <button type="button" id="button_answer">I've got the answer !</button>
     </div>
 </form>
 
@@ -19,8 +19,9 @@
     const red_tag  = '<p style="color:#FF0000">Red team\'s score: ';
 
     var form = document.querySelector("form");
+    var btn = document.getElementById('button_answer');
 
-    form.addEventListener("submit", function(event) {
+    btn.addEventListener("click", function(event) {
           var data = new FormData(form);
           const teamName = JSON.parse(document.getElementById('team-name').textContent);
 

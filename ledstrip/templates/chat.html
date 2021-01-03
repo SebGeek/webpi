@@ -9,7 +9,7 @@
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         // Append text received from server to chat-log area
-        document.querySelector('#chat-log').value += (data.message + ' ' + JSON.stringify(data) + '\n');
+        document.querySelector('#chat-log').value += (data.message + '\n');
     };
 
     chatSocket.onclose = function(e) {

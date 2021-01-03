@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .forms import ChristmasTree, BlindMaster, BlindTeam
+from .forms import ChristmasTree
 import ledstrip.glob_var
 
 ############################################################################ LED
@@ -182,51 +182,18 @@ def home_page(request):
     return render(request, 'ledstrip/home_page.html', context={'form': form})
 
 def master(request):
-    # If this is a POST request then process the Form data
-    if request.method == 'POST':
-
-        # Create a form instance and populate it with data from the request (binding)
-        form = BlindMaster(request.POST)
-
-        # Check if the form is valid:
-        if form.is_valid():
-            if form.cleaned_data['blind_music'] == 'off':
-                stop_music()
-            elif form.cleaned_data['blind_music'] != '':
-                ledstrip.glob_var.faster_team_to_answer = None
-                unicolor(ledstrip.glob_var.white)
-                play_music(form.cleaned_data['blind_music'])
-
-            if form.cleaned_data['volume'] != None:
-                set_volume(form.cleaned_data['volume'])
-
-            if form.cleaned_data['bad_answer_continue'] == True:
-                ledstrip.glob_var.faster_team_to_answer = None
-                unicolor(ledstrip.glob_var.white)
-                continue_music()
-
-            # redirect to a new URL
-            return HttpResponseRedirect('/master')
-
-    # If this is a GET (or any other method) create the default form
-    else:
-        form = BlindMaster()
-
-    context = {'form': form, 'team': 'master', 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+    context = {'team': 'master', 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
                'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
     return render(request, 'ledstrip/master.html', context=context)
 
 def blueteam(request):
-    return team(request, 'blue', ledstrip.glob_var.blue)
+    return team(request, 'blue')
 
 def redteam(request):
-    return team(request, 'red', ledstrip.glob_var.red)
+    return team(request, 'red')
 
-def team(request, color, _rgb_color):
-    # It is a GET, create the default form
-    form = BlindTeam()
-
-    context = {'form': form, 'team': color, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+def team(request, color):
+    context = {'team': color, 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
                'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
     return render(request, 'ledstrip/team.html', context=context)
 
