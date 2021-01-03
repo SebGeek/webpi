@@ -4,6 +4,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .views import unicolor, stop_music, set_volume, continue_music, play_music
 import ledstrip.glob_var
+from ledstrip.forms import blind_music_choices
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -68,6 +69,7 @@ class TeamBlindConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
+        context = {}
 
         if text_data_json['team'] in ['blue', 'red']:
             if ledstrip.glob_var.faster_team_to_answer == None:
@@ -109,8 +111,10 @@ class TeamBlindConsumer(AsyncWebsocketConsumer):
                 unicolor(ledstrip.glob_var.white)
                 continue_music()
 
-        context = {'team': text_data_json['team'], 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
-                   'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score}
+            context.update({'blind_music_choices': blind_music_choices})
+
+        context.update({'team': text_data_json['team'], 'faster_team_to_answer': ledstrip.glob_var.faster_team_to_answer,
+                        'blue_score': ledstrip.glob_var.blue_score, 'red_score': ledstrip.glob_var.red_score})
 
         # Send message to room group
         await self.channel_layer.group_send(
