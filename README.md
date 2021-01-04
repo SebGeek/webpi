@@ -291,9 +291,14 @@ crontab -e
 ```
 ## Websockets: Install redis-server Redis 5 (or newer)
 * Windows:
+
 https://github.com/tporadowski/redis/releases
+
 * Raspberry pi: Download, Extract and Compile Redis
+
 https://habilisbest.com/install-redis-on-your-raspberrypi
+
+https://mudpi.app/guides/4
 
 # Common commands
 ```
