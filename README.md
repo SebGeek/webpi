@@ -146,9 +146,9 @@ source ~/webpienv/bin/activate
 
 To deactivate type: deactivate
 ```
-* Install Django
+* Install django, channels...
 ```
-pip3 install django
+pip install -r requirements.txt
 ```
 * Configure path
 ```
@@ -289,6 +289,11 @@ USE crontab:
 crontab -e
 @reboot sleep 30 && curl http://127.0.0.1
 ```
+## Websockets: Install redis-server Redis 5 (or newer)
+* Windows:
+https://github.com/tporadowski/redis/releases
+* Raspberry pi: Download, Extract and Compile Redis
+https://habilisbest.com/install-redis-on-your-raspberrypi
 
 # Common commands
 ```

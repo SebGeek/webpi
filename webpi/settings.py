@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     'ledstrip',
 ]
 
-# Install Redis 5 (or newer)
-# https://github.com/tporadowski/redis/releases
+# Install Redis 5 server (or newer)
 
 ASGI_APPLICATION = 'webpi.asgi.application'
 
