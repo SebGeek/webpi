@@ -70,9 +70,7 @@ sudo systemctl restart smbd.service
 ## Clone GIT repository from GitHub
 ```
 sudo apt-get install git
-cd ~/partage
-git clone https://github.com/SebGeek/teleinfo.git
-git remote set-url origin git+ssh://git@github.com/SebGeek/teleinfo.git
+git clone https://github.com/SebGeek/<repo>.git
 ```
 * Need to put SSH key in Github in order to avoid a username/password connection
     * Generate an SSH keys pair on raspberry pi:
@@ -85,7 +83,7 @@ git remote set-url origin git+ssh://git@github.com/SebGeek/teleinfo.git
     
     * tell the Raspberry to use SSH connection:
     ```
-    git remote set-url origin git@github.com:SebGeek/teleinfo.git
+    git remote set-url origin git@github.com:SebGeek/<repo>.git
     ```
 ## Pour éviter les problèmes de corruption de la carte SD
 * suppression du swap sur la carte SD
@@ -122,12 +120,12 @@ tmpfs    /var/log    tmpfs    defaults,noatime,nosuid,mode=0755,size=10m    0 0
 ```
 sudo usermod -a -G dialout pi
 ```
-## AUTOMATIC start-up of teleinfo logger (after Raspberry start-up)
+## AUTOMATIC start-up of <prog> (after Raspberry start-up)
 DO NOT EDIT /etc/rc.local to start python script because user is root
 USE crontab:
 ```
 crontab -e
-@reboot /usr/bin/python3 /home/pi/partage/teleinfo/logger/Teleinfo_Logger.py -o /home/pi/partage/teleinfo/log/log.csv &
+@reboot /usr/bin/python3 /home/pi/.../<prog>.py &
 ```
 # Django
 Web server (LAMP server on port 80) -> gunicorn (WSGI server) -> Django (on port 8000)
@@ -181,7 +179,7 @@ nano ~/webpi/settings.py
 	)
 
 	Update:
-		ALLOWED_HOSTS = ["192.168.0.25", "raspberrypi"]
+		ALLOWED_HOSTS = ["*"]
 
 python manage.py makemigrations
 python manage.py migrate
@@ -189,9 +187,9 @@ python manage.py migrate
 * Run server in development mode
 ```
 source ~/webpienv/bin/activate
-python manage.py runserver 192.168.0.25:8000
+python manage.py runserver 192.168.0.51:8000
 ```
-Browse http://192.168.0.25:8000/
+Browse http://192.168.0.51:8000/
 * Installing Apache
 ```
 deactivate
@@ -199,7 +197,7 @@ sudo apt-get install apache2 -y
 sudo apt-get install apache2-dev -y
 sudo apt-get install libapache2-mod-wsgi-py3
 ```
-Browse http://192.168.0.25
+Browse http://192.168.0.51
 * Configuring Apache to serve Django Pages using WSGI
 ```
 sudo nano /etc/apache2/sites-available/000-default.conf
@@ -297,7 +295,7 @@ crontab -e
 sudo systemctl restart apache2
 
 source ~/webpienv/bin/activate
-python manage.py runserver 192.168.0.25:8000
+python manage.py runserver 192.168.0.51:8000
 
 sudo shutdown -h now
 ```
