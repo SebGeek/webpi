@@ -8,3 +8,4 @@ pygame
 django
 channels
 channels_redis
+daphne

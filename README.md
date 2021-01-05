@@ -287,7 +287,7 @@ sudo nano /etc/group
 USE crontab:
 ```
 crontab -e
-@reboot sleep 30 && curl http://127.0.0.1
+@reboot sleep 60 && curl http://127.0.0.1
 ```
 ## Websockets: Install redis-server Redis 5 (or newer)
 * Windows:
@@ -299,6 +299,17 @@ https://github.com/tporadowski/redis/releases
 https://habilisbest.com/install-redis-on-your-raspberrypi
 
 https://mudpi.app/guides/4
+
+# Need to use Daphne server instead of Apache (which doesn't manage ASGI)
+```
+source ~/webpienv/bin/activate
+python -m pip install daphne
+```
+
+~/webpienv/bin/daphne webpi.asgi:application --bind 0.0.0.0
+
+sudo ~/webpienv/bin/daphne webpi.asgi:application --port 80 --bind 0.0.0.0 -v2
+sudo python manage.py runworker -v2
 
 # Common commands
 ```
