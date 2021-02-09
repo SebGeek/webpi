@@ -305,11 +305,21 @@ https://mudpi.app/guides/4
 source ~/webpienv/bin/activate
 python -m pip install daphne
 ```
+python manage.py collectstatic
 
 ~/webpienv/bin/daphne webpi.asgi:application --bind 0.0.0.0
+todo: problème static files
 
 sudo ~/webpienv/bin/daphne webpi.asgi:application --port 80 --bind 0.0.0.0 -v2
 sudo python manage.py runworker -v2
+
+```
+sudo systemctl disable apache2
+
+crontab -e
+@reboot sudo ~/webpienv/bin/python ~/webpi/manage.py runserver 192.168.0.51:80
+@reboot sleep 60 && curl http://127.0.0.1
+```
 
 # Common commands
 ```
@@ -317,6 +327,8 @@ sudo systemctl restart apache2
 
 source ~/webpienv/bin/activate
 python manage.py runserver 192.168.0.51:8000
+
+sudo ~/webpienv/bin/python ~/webpi/manage.py runserver 192.168.0.51:80
 
 sudo shutdown -h now
 ```
